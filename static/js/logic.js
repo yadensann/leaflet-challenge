@@ -84,14 +84,7 @@ d3.json(earthquake_url, function(earthquake_data) {
         };
     }
     // color function to be used when creating the legend
-    function get_color(d) {
-        return d > 5 ? '#581845' :
-            d > 4  ? '#900C3F' :
-            d > 3  ? '#C70039' :
-            d > 2  ? '#eecc00' :
-            d > 1  ? '#d4ee00' :
-                    '#ccf98ee00f33';
-    }
+
 // Create a GeoJSON layer containing the features array on the earthquakeData object
     // Run the onEachFeature function once for each piece of data in the array
     L.geoJSON(earthquake_data, {
@@ -100,31 +93,65 @@ d3.json(earthquake_url, function(earthquake_data) {
         },
         style: marker_style,
         onEachFeature: function(feature, layer) {
-            layer.bindPopup(("<h4>Location: " + feature.properties.place + 
-            "</h4><hr><p>Date & Time: " + new Date(feature.properties.time) + 
-            "</p><hr><p>Magnitude: " + feature.properties.mag + "</p>")
+            layer.bindPopup(("<b><h4>Location: </b>" + feature.properties.place + 
+            "</h4><hr><p><b>Date & Time: </b>" + new Date(feature.properties.time) + 
+            "</p><hr><p><b>Magnitude: </b>" + feature.properties.mag + "</p>")
         )}
     }).addTo(earthquake_layer)
     earthquake_layer.addTo(myMap);
 
-  // Add legend to the map
-    var legend = L.control({position: 'topleft'});
-    legend.onAdd = function (myMap) {
-        var div = L.DomUtil.create('div', 'info legend'),
-            magnitudes = [0, 1, 2, 3, 4, 5],
-            labels = [];
+    function get_color(d) {
+        return d > 5 ? '#581845' :
+            d > 4  ? '#900C3F' :
+            d > 3  ? '#C70039' :
+            d > 2  ? '#eecc00' :
+            d > 1  ? '#d4ee00' :
+                    '#ccf98ee00f33';
+    }
 
-            // loop through our density intervals and generate a label with a colored square for each interval
-            for (var i = 0; i < magnitudes.length; i++) {
-                div.innerHTML +=
-                    '<i style="background:' + get_color(magnitudes[i] + 1) + '"></i> ' +
-                    magnitudes[i] + (magnitudes[i + 1] ? '&ndash;' + magnitudes[i + 1] + '<br>' : '+');
-            }
-                return div;
-            };
+    var legend = L.control({
+      position: 'bottomleft'
+    });
+    
+    legend.onAdd = function(myMap) {
+      var div = L.DomUtil.create('div', 'info legend'),
+        magnitudes = [0, 1, 2, 3, 4, 5],
+        labels = [],
+        from, to;
+    
+        for (var i = 0; i < magnitudes.length; i++) {
+            from = magnitudes[i];
+            to = magnitudes[i + 1];
+    
+        labels.push(
+          '<i style="background:' + get_color(from + 1) + '">[color]</i> ' +
+          from + (to ? '&ndash;' + to : '+'));
+      }
+        div.innerHTML = labels.join('<br>');
+            return div;
+    };
 
-    legend.addTo(myMap);
+    // Do not forget to add your control to the map?
+legend.addTo(myMap);
 });
+//   // Add legend to the map
+//     var legend = L.control({position: 'topleft'});
+//     legend.onAdd = function (myMap) {
+//         var div = L.DomUtil.create('div', 'info legend'),
+//             magnitudes = [0, 1, 2, 3, 4, 5],
+//             labels = [];
+
+//             // loop through our density intervals and generate a label with a colored square for each interval
+//             for (var i = 0; i < magnitudes.length; i++) {
+//                 div.innerHTML +=
+//                     '<i style="background:' + choose_color(magnitudes[i] + 1) + '"></i> ' +
+//                     magnitudes[i] + (magnitudes[i + 1] ? '&ndash;' + magnitudes[i + 1] + '<br>' : '+');
+//             }
+//                 return div;
+//             };
+
+//     legend.addTo(myMap);
+// });
 
 
 // var legend = L.control({
