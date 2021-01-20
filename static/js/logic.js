@@ -55,17 +55,6 @@ d3.json(earthquake_url, function(earthquake_data) {
         }
         return magnitude * 3;
     }
-    function marker_style(feature) {
-        return {
-            opacity: 1,
-            fillOpacity: 1,
-            fillColor: choose_color(feature.properties.mag),
-            color: "#000000",
-            radius: marker_size(feature.properties.mag),
-            stroke: true,
-            weight: 0.5
-          };
-        }
     // Function to Determine Color of Marker Based on the Magnitude of the Earthquake. Nothing was under the magnitude of 3.
     function choose_color(magnitude) {
         switch (true) {
@@ -83,9 +72,28 @@ d3.json(earthquake_url, function(earthquake_data) {
             return "#98ee00";
         }
     }
-
-    // Create a GeoJSON layer containing the features array on the earthquakeData object
-        // Run the onEachFeature function once for each piece of data in the array
+    function marker_style(feature) {
+        return {
+            opacity: 1,
+            fillOpacity: 1,
+            fillColor: choose_color(feature.properties.mag),
+            color: "#000000",
+            radius: marker_size(feature.properties.mag),
+            stroke: true,
+            weight: 0.5
+        };
+    }
+    // color function to be used when creating the legend
+    function get_color(d) {
+        return d > 5 ? '#581845' :
+            d > 4  ? '#900C3F' :
+            d > 3  ? '#C70039' :
+            d > 2  ? '#eecc00' :
+            d > 1  ? '#d4ee00' :
+                    '#ccf98ee00f33';
+    }
+// Create a GeoJSON layer containing the features array on the earthquakeData object
+    // Run the onEachFeature function once for each piece of data in the array
     L.geoJSON(earthquake_data, {
         pointToLayer: function(feature, latlng) {
             return L.circleMarker(latlng);
@@ -99,63 +107,58 @@ d3.json(earthquake_url, function(earthquake_data) {
     }).addTo(earthquake_layer)
     earthquake_layer.addTo(myMap);
 
+  // Add legend to the map
+    var legend = L.control({position: 'topleft'});
+    legend.onAdd = function (myMap) {
+        var div = L.DomUtil.create('div', 'info legend'),
+            magnitudes = [0, 1, 2, 3, 4, 5],
+            labels = [];
 
-    // function get_color(d) {
-    //     return d > 5 ? '#581845' :
-    //             d > 4  ? '#900C3F' :
-    //             d > 3  ? '#C70039' :
-    //             d > 2  ? '#eecc00' :
-    //             d > 1  ? '#d4ee00' :
-    //                     '#98ee00';
-    //     }
-
-    var legend= L.control ({
-        position: "topleft"
-    });
-
-    legend.onAdd = function() {
-    var div = L
-      .DomUtil
-      .create("div", "info legend");
-    
-    var grades = [0, 1, 2, 3, 4, 5];
-    var colors = [
-        "#98ee00",
-        "#d4ee00",
-        "#eecc00",
-        "#ee9c00",
-        "#ea822c",
-        "#ea2c2c"
-    ];
-
-    for (var i = 0; i < grades.length; i++) {
-        div.innerHTML += "<i style='background: " + get_color[i] + "'></i> " +
-        grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
-      }
-        return div;
-    };
+            // loop through our density intervals and generate a label with a colored square for each interval
+            for (var i = 0; i < magnitudes.length; i++) {
+                div.innerHTML +=
+                    '<i style="background:' + get_color(magnitudes[i] + 1) + '"></i> ' +
+                    magnitudes[i] + (magnitudes[i + 1] ? '&ndash;' + magnitudes[i + 1] + '<br>' : '+');
+            }
+                return div;
+            };
 
     legend.addTo(myMap);
 });
 
 
+// var legend = L.control({
+//     position: "topleft"
+//     });
+
+//     legend.onAdd = function() {
+//         var div = L
+//             .DomUtil
+//             .create("div", "info legend");
+
+//         var grades = [0, 1, 2, 3, 4, 5], {
+//             for (i= 0; i< grades.length; i++), {
+//                 var colors = [
+//                     "#98ee00",
+//                     "#d4ee00",
+//                     "#eecc00",
+//                     "#ee9c00",
+//                     "#ea822c",
+//                     "#ea2c2c"
+//                 ];
+//             }
+//         };
 
 
+//             for (var i = 0; i < grades.length; i++) {
+//                 div.innerHTML += "<i style='background: " + colors[i] + "'></i> " +
+//                 grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
+//             }
+//                 return div;
+//             };
+    
+//     legend.addTo(myMap);
+// });
 
 
-
-
-
-
-    //         radius: radius_size(earthquake_data.properties.mag),
-    //         color: circle_color(earthquake_data.properties.mag),
-    //         fillOpacity: 1
-    //     });
-    //     },
-    //     onEachFeature: 
-    // });
-
-    // // Sending our earthquakes layer to the createMap function
-    // createMap(earthquakes);
-    // });
 
