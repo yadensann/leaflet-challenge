@@ -1,20 +1,24 @@
 // Visualizing Data with Leaflet
 
-// Significant Earthquake GeoJSON URL variables
-var earthquake_url=  'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson#'
+// All Earthquakes in the last 7 days GeoJSON URL variables
+var earthquake_url=  'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson'
 
 // Create LayerGroup for earthquakes
 var earthquake_layer= new L.LayerGroup();
+var satellite_layer= new L.LayerGroup();
+var light_layer= new L.LayerGroup();
 
 // Variables for tile layers
-var satellite_map = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+var satellite_map = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v9/tiles/256/{z}/{x}/{y}?" +
+    "access_token=pk.eyJ1IjoibWFudWVsYW1hY2hhZG8iLCJhIjoiY2ppczQ0NzBtMWNydTNrdDl6Z2JhdzZidSJ9.BFD3qzgAC2kMoEZirGaDjA", {
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
     maxZoom: 18,
     id: "mapbox.satellite",
     accessToken: API_KEY
 });
 
-var light_mode= L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+var light_mode= L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?" +
+    "access_token=pk.eyJ1IjoibWFudWVsYW1hY2hhZG8iLCJhIjoiY2ppczQ0NzBtMWNydTNrdDl6Z2JhdzZidSJ9.BFD3qzgAC2kMoEZirGaDjA", {
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
     maxZoom: 18,
     id: "mapbox.light",
@@ -36,7 +40,7 @@ var overlayMaps = {
 var myMap = L.map("map", {
     center: [37.09, -95.71],
     zoom: 2,
-    layers: [satellite_map, earthquake_layer]
+    layers: [satellite_map, light_mode, earthquake_layer]
 });
 
 // Adding layer control to map
@@ -62,7 +66,7 @@ d3.json(earthquake_url, function(earthquake_data) {
             weight: 0.5
           };
         }
-    // Function to Determine Color of Marker Based on the Magnitude of the Earthquake
+    // Function to Determine Color of Marker Based on the Magnitude of the Earthquake. Nothing was under the magnitude of 3.
     function choose_color(magnitude) {
         switch (true) {
         case magnitude > 5:
@@ -72,11 +76,11 @@ d3.json(earthquake_url, function(earthquake_data) {
         case magnitude > 3:
             return "#C70039";
         case magnitude > 2:
-            return "#FF5733";
+            return "#eecc00";
         case magnitude > 1:
-            return "#FFC300";
+            return "#d4ee00";
         default:
-            return "#DAF7A6";
+            return "#98ee00";
         }
     }
 
@@ -92,9 +96,57 @@ d3.json(earthquake_url, function(earthquake_data) {
             "</h4><hr><p>Date & Time: " + new Date(feature.properties.time) + 
             "</p><hr><p>Magnitude: " + feature.properties.mag + "</p>")
         )}
-}).addTo(earthquake_layer)
-earthquake_layer.addTo(myMap);
-})
+    }).addTo(earthquake_layer)
+    earthquake_layer.addTo(myMap);
+
+
+    // function get_color(d) {
+    //     return d > 5 ? '#581845' :
+    //             d > 4  ? '#900C3F' :
+    //             d > 3  ? '#C70039' :
+    //             d > 2  ? '#eecc00' :
+    //             d > 1  ? '#d4ee00' :
+    //                     '#98ee00';
+    //     }
+
+    var legend= L.control ({
+        position: "topleft"
+    });
+
+    legend.onAdd = function() {
+    var div = L
+      .DomUtil
+      .create("div", "info legend");
+    
+    var grades = [0, 1, 2, 3, 4, 5];
+    var colors = [
+        "#98ee00",
+        "#d4ee00",
+        "#eecc00",
+        "#ee9c00",
+        "#ea822c",
+        "#ea2c2c"
+    ];
+
+    for (var i = 0; i < grades.length; i++) {
+        div.innerHTML += "<i style='background: " + get_color[i] + "'></i> " +
+        grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
+      }
+        return div;
+    };
+
+    legend.addTo(myMap);
+});
+
+
+
+
+
+
+
+
+
+
     //         radius: radius_size(earthquake_data.properties.mag),
     //         color: circle_color(earthquake_data.properties.mag),
     //         fillOpacity: 1
