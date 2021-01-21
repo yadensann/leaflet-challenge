@@ -8,7 +8,7 @@ var tectonics_url = "https://raw.githubusercontent.com/fraxen/tectonicplates/mas
 var earthquake_layer= new L.LayerGroup();
 var satellite_layer= new L.LayerGroup();
 var light_layer= new L.LayerGroup();
-var terrain_later= new L.LayerGroup();
+// var terrain_later= new L.LayerGroup();
 // Bonus
 var tectonics_layer= new L.LayerGroup();
 
@@ -29,19 +29,19 @@ var light_mode= L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/light-v9/ti
     accessToken: API_KEY
 });
 
-var terrain_map = L.tileLayer("https://api.mapbox.com/v4/mapbox.terrain-rgb/{zoom}/{x}/{y}.pngraw?access_token=pk.eyJ1IjoieWFkZW5zYW5uIiwiYSI6ImNranB5a3ByczBsbWQycW15MWxqbHgxNTQifQ.Z_r4rsFDVyWs7Fe_pzDcfA", {
-    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-    maxZoom: 14,
-    id: "mapbox.terrain",
-    accessToken: API_KEY
+// var terrain_map = L.tileLayer("https://api.mapbox.com/v4/mapbox.terrain-rgb/{zoom}/{x}/{y}.pngraw?access_token=pk.eyJ1IjoieWFkZW5zYW5uIiwiYSI6ImNranB5a3ByczBsbWQycW15MWxqbHgxNTQifQ.Z_r4rsFDVyWs7Fe_pzDcfA", {
+//     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+//     maxZoom: 14,
+//     id: "mapbox.terrain",
+//     accessToken: API_KEY
 
-});
+
 
 // Define baseMaps Object to Hold Base Layers
 var baseMaps = {
     "Satellite": satellite_map,
     "Light": light_mode,
-    "Terrain": terrain_map
+    // "Terrain": terrain_map
 };
 // Create Overlay Object to Hold Overlay Layers
 var overlayMaps = {
@@ -81,10 +81,10 @@ d3.json(earthquake_url, function(earthquake_data) {
             return "#eecc00";
         case magnitude > 1:
             return "#d4ee00";
-        case magnitude < 1 + null:
-            return 'white';
-        default:
-            return "#98ee00";
+        case magnitude < 1:
+            return 'pink';
+        // default:
+        //     return "#98ee00";
         }
     }
     function marker_style(feature) {
@@ -116,34 +116,30 @@ d3.json(earthquake_url, function(earthquake_data) {
     earthquake_layer.addTo(myMap);
 
     function get_color(d) {
-        return d > 5 ? '#581845' :
+        return d > 5 ? '#581845' : 
             d > 4  ? '#900C3F' :
             d > 3  ? '#C70039' :
             d > 2  ? '#eecc00' :
             d > 1  ? '#d4ee00' :
+            d < 1  ? 'pink':
                     'white';
     }
 
-    var legend = L.control({
-    position: 'bottomleft'
-    });
-    
-    legend.onAdd = function(myMap) {
-    var div = L.DomUtil.create('div', 'info legend'),
-        magnitudes = [0, 1, 2, 3, 4, 5],
-        labels = [],
-        from, to;
-    
+    var legend = L.control({ position: "bottomleft" });
+
+    legend.onAdd = function() {
+        
+        var div = L.DomUtil.create("div", "info legend"), 
+        magnitudes= [0, 1, 2, 3, 4, 5];
+
+        div.innerHTML += "<h3>Magnitude</h3>"
+
         for (var i = 0; i < magnitudes.length; i++) {
-            from = magnitudes[i];
-            to = magnitudes[i + 1];
-    
-        labels.push(
-        '<i style="background:' + get_color(from + 1) + '">Mag. range</i> ' +
-        from + (to ? '&ndash;' + to : '+'));
-    }
-        div.innerHTML = labels.join('<br>');
-            return div;
+            div.innerHTML +=
+                '<i style="background: ' + get_color(magnitudes[i]) + '"></i> ' +
+                magnitudes[i] + (magnitudes[i + 1] ? '&ndash;' + magnitudes[i + 1] + '<br>' : '+');
+        }
+        return div;
     };
     legend.addTo(myMap);
 
@@ -152,12 +148,11 @@ d3.json(earthquake_url, function(earthquake_data) {
     d3.json(tectonics_url, function(plate_data) {
         L.geoJSON(plate_data, {
             color: "pink",
-            weight: 3
+            weight: 2
         }).addTo(tectonics_layer)
         tectonics_layer.addTo(myMap);
 
 });
-
 
 
 
