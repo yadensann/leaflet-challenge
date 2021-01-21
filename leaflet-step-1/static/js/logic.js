@@ -158,58 +158,6 @@ d3.json(earthquake_url, function(earthquake_data) {
 
 });
 
-//   // Add legend to the map
-//     var legend = L.control({position: 'topleft'});
-//     legend.onAdd = function (myMap) {
-//         var div = L.DomUtil.create('div', 'info legend'),
-//             magnitudes = [0, 1, 2, 3, 4, 5],
-//             labels = [];
-
-//             // loop through our density intervals and generate a label with a colored square for each interval
-//             for (var i = 0; i < magnitudes.length; i++) {
-//                 div.innerHTML +=
-//                     '<i style="background:' + choose_color(magnitudes[i] + 1) + '"></i> ' +
-//                     magnitudes[i] + (magnitudes[i + 1] ? '&ndash;' + magnitudes[i + 1] + '<br>' : '+');
-//             }
-//                 return div;
-//             };
-
-//     legend.addTo(myMap);
-// });
-
-
-// var legend = L.control({
-//     position: "topleft"
-//     });
-
-//     legend.onAdd = function() {
-//         var div = L
-//             .DomUtil
-//             .create("div", "info legend");
-
-//         var grades = [0, 1, 2, 3, 4, 5], {
-//             for (i= 0; i< grades.length; i++), {
-//                 var colors = [
-//                     "#98ee00",
-//                     "#d4ee00",
-//                     "#eecc00",
-//                     "#ee9c00",
-//                     "#ea822c",
-//                     "#ea2c2c"
-//                 ];
-//             }
-//         };
-
-
-//             for (var i = 0; i < grades.length; i++) {
-//                 div.innerHTML += "<i style='background: " + colors[i] + "'></i> " +
-//                 grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
-//             }
-//                 return div;
-//             };
-    
-//     legend.addTo(myMap);
-// });
 
 
 
