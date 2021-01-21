@@ -2,11 +2,15 @@
 
 // All Earthquakes in the last 7 days GeoJSON URL variables
 var earthquake_url=  'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson'
+var tectonics_url = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_plates.json";
 
 // Create LayerGroup for earthquakes
 var earthquake_layer= new L.LayerGroup();
 var satellite_layer= new L.LayerGroup();
 var light_layer= new L.LayerGroup();
+var terrain_later= new L.LayerGroup();
+// Bonus
+var tectonics_layer= new L.LayerGroup();
 
 // Variables for tile layers
 var satellite_map = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v9/tiles/256/{z}/{x}/{y}?" +
@@ -25,22 +29,31 @@ var light_mode= L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/light-v9/ti
     accessToken: API_KEY
 });
 
+var terrain_map = L.tileLayer("https://api.mapbox.com/v4/mapbox.terrain-rgb/{zoom}/{x}/{y}.pngraw?access_token=pk.eyJ1IjoieWFkZW5zYW5uIiwiYSI6ImNranB5a3ByczBsbWQycW15MWxqbHgxNTQifQ.Z_r4rsFDVyWs7Fe_pzDcfA", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    maxZoom: 14,
+    id: "mapbox.terrain",
+    accessToken: API_KEY
+
+});
+
 // Define baseMaps Object to Hold Base Layers
 var baseMaps = {
     "Satellite": satellite_map,
     "Light": light_mode,
+    "Terrain": terrain_map
 };
-
 // Create Overlay Object to Hold Overlay Layers
 var overlayMaps = {
-    "Earthquakes": earthquake_layer
+    "Earthquakes": earthquake_layer,
+    "Fault Lines": tectonics_layer
 };
 
 // Create Map, Passing In satelliteMap & earthquakes as Default Layers to Display on Load
 var myMap = L.map("map", {
     center: [37.09, -95.71],
     zoom: 2,
-    layers: [satellite_map, light_mode, earthquake_layer]
+    layers: [satellite_map,  earthquake_layer]
 });
 
 // Adding layer control to map
@@ -112,11 +125,11 @@ d3.json(earthquake_url, function(earthquake_data) {
     }
 
     var legend = L.control({
-      position: 'bottomleft'
+    position: 'bottomleft'
     });
     
     legend.onAdd = function(myMap) {
-      var div = L.DomUtil.create('div', 'info legend'),
+    var div = L.DomUtil.create('div', 'info legend'),
         magnitudes = [0, 1, 2, 3, 4, 5],
         labels = [],
         from, to;
@@ -126,66 +139,25 @@ d3.json(earthquake_url, function(earthquake_data) {
             to = magnitudes[i + 1];
     
         labels.push(
-          '<i style="background:' + get_color(from + 1) + '">Mag. range</i> ' +
-          from + (to ? '&ndash;' + to : '+'));
-      }
+        '<i style="background:' + get_color(from + 1) + '">Mag. range</i> ' +
+        from + (to ? '&ndash;' + to : '+'));
+    }
         div.innerHTML = labels.join('<br>');
             return div;
     };
-legend.addTo(myMap);
+    legend.addTo(myMap);
+
 });
-//   // Add legend to the map
-//     var legend = L.control({position: 'topleft'});
-//     legend.onAdd = function (myMap) {
-//         var div = L.DomUtil.create('div', 'info legend'),
-//             magnitudes = [0, 1, 2, 3, 4, 5],
-//             labels = [];
 
-//             // loop through our density intervals and generate a label with a colored square for each interval
-//             for (var i = 0; i < magnitudes.length; i++) {
-//                 div.innerHTML +=
-//                     '<i style="background:' + choose_color(magnitudes[i] + 1) + '"></i> ' +
-//                     magnitudes[i] + (magnitudes[i + 1] ? '&ndash;' + magnitudes[i + 1] + '<br>' : '+');
-//             }
-//                 return div;
-//             };
+    d3.json(tectonics_url, function(plate_data) {
+        L.geoJSON(plate_data, {
+            color: "pink",
+            weight: 3
+        }).addTo(tectonics_layer)
+        tectonics_layer.addTo(myMap);
 
-//     legend.addTo(myMap);
-// });
+});
 
-
-// var legend = L.control({
-//     position: "topleft"
-//     });
-
-//     legend.onAdd = function() {
-//         var div = L
-//             .DomUtil
-//             .create("div", "info legend");
-
-//         var grades = [0, 1, 2, 3, 4, 5], {
-//             for (i= 0; i< grades.length; i++), {
-//                 var colors = [
-//                     "#98ee00",
-//                     "#d4ee00",
-//                     "#eecc00",
-//                     "#ee9c00",
-//                     "#ea822c",
-//                     "#ea2c2c"
-//                 ];
-//             }
-//         };
-
-
-//             for (var i = 0; i < grades.length; i++) {
-//                 div.innerHTML += "<i style='background: " + colors[i] + "'></i> " +
-//                 grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
-//             }
-//                 return div;
-//             };
-    
-//     legend.addTo(myMap);
-// });
 
 
 
