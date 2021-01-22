@@ -78,13 +78,13 @@ d3.json(earthquake_url, function(earthquake_data) {
         case magnitude > 3:
             return "#C70039";
         case magnitude > 2:
-            return "#eecc00";
+            return "#FF5733";
         case magnitude > 1:
-            return "#d4ee00";
+            return "#FFC300";
         case magnitude < 1:
-            return 'pink';
-        // default:
-        //     return "#98ee00";
+            return 'white';
+        default:
+            return "#DAF7A6";
         }
     }
     function marker_style(feature) {
@@ -119,10 +119,10 @@ d3.json(earthquake_url, function(earthquake_data) {
         return d > 5 ? '#581845' : 
             d > 4  ? '#900C3F' :
             d > 3  ? '#C70039' :
-            d > 2  ? '#eecc00' :
-            d > 1  ? '#d4ee00' :
-            d < 1  ? 'pink':
-                    'white';
+            d > 2  ? '#FF5733' :
+            d > 1  ? '#FFC300' :
+            d < 1  ? 'white':
+                    '#DAF7A6';
     }
 
     var legend = L.control({ position: "bottomleft" });
@@ -133,7 +133,6 @@ d3.json(earthquake_url, function(earthquake_data) {
         magnitudes= [0, 1, 2, 3, 4, 5];
 
         div.innerHTML += "<h3>Magnitude</h3>"
-
         for (var i = 0; i < magnitudes.length; i++) {
             div.innerHTML +=
                 '<i style="background: ' + get_color(magnitudes[i]) + '"></i> ' +
@@ -147,7 +146,7 @@ d3.json(earthquake_url, function(earthquake_data) {
 
     d3.json(tectonics_url, function(plate_data) {
         L.geoJSON(plate_data, {
-            color: "pink",
+            color: "#F7D7A6",
             weight: 2
         }).addTo(tectonics_layer)
         tectonics_layer.addTo(myMap);
